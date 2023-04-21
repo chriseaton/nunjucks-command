@@ -1,6 +1,6 @@
 {
 	"name": "nunjucks-command",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "A simple Nunjucks command-line (CLI) wrapper and template watcher, to generate static HTML files.",
 	"author": "Christopher Eaton",
 	"repository": "github:chriseaton/nunjucks-command",
