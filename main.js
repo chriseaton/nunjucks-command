@@ -87,7 +87,6 @@ const { argv } = yargs(process.argv.slice(2))
             }
             console.log('Rendering: ' + file);
             await fs.writeFile(path.join(outputDir, outputFile), res);
-            console.log('wrote', outputFile)
         }
     }
 
@@ -100,7 +99,6 @@ const { argv } = yargs(process.argv.slice(2))
         for (let file of new Glob(argv._[0], globOptions)) {
             files.push(file);
         }
-        console.log(files);
         await render(files);
     } catch (err) {
         console.error(err);
