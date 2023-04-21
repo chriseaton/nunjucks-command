@@ -7,23 +7,26 @@ process.env.NODE_ENV = 'development';
 const src = `test/fixtures`;
 const dist = `test/fixtures/dist`;
 const context = `test/fixtures/data.json`;
-const glob = `*.tpl`;
+const glob = `**/*.tpl`;
 const cmd = `node main.js ${glob} ${context} -p ${src} -o ${dist}`;
 
 (async () => {
     spawnSync(cmd, { shell: true, stdio: 'inherit' });
-    const filesCompiled = await fs.readdir(dist);
-    deepStrictEqual(filesCompiled, ['first.html', 'second.html'], 'Templates not rendered correctly');
+    let filesCompiled = await fs.readdir(dist);
+    deepStrictEqual(filesCompiled, ['first.html', 'second.html', 'third'], 'Templates not rendered correctly');
     for (const file of filesCompiled) {
-        const content = await fs.readFile(`${dist}/${file}`, 'utf8');
-        ok(content.startsWith('<!DOCTYPE html>'), 'Layout not extended');
-        if (file === 'first.html') {
-            ok(content.includes('json,file'), 'Context not interpolated');
+        if (file.match(/.*\.html$/i)) {
+            const content = await fs.readFile(`${dist}/${file}`, 'utf8');
+            ok(content.startsWith('<!DOCTYPE html>'), 'Layout not extended');
+            if (file === 'first.html') {
+                ok(content.includes('json,file'), 'Context not interpolated');
+            }
+            if (file === 'second.html') {
+                ok(content.includes('development'), 'Env variable not passed');
+            }
         }
-        if (file === 'second.html') {
-            ok(content.includes('development'), 'Env variable not passed');
-        }
-        await fs.unlink(`${dist}/${file}`);
     }
-    await fs.rm(dist, { recursive: true, force: true });
+    filesCompiled = await fs.readdir(dist + '/third');
+    deepStrictEqual(filesCompiled, ['third.html'], 'Templates not rendered correctly');
+    // await fs.rm(dist, { recursive: true, force: true });
 })();

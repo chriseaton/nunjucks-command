@@ -76,7 +76,7 @@ const { argv } = yargs(process.argv.slice(2))
             let outputFile = file.replace(/\.\w+$/, `.${argv.extension}`);
             if (outputDir) {
                 try {
-                    await fs.mkdir(outputDir, true);
+                    await fs.mkdir(path.join(outputDir, dirname(outputFile)), true);
                 } catch (err) {
                     //it's ok if the dir aready exists
                     if (!err.code === 'EEXIST') {
