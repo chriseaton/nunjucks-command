@@ -53,25 +53,54 @@ const { argv } = yargs(process.argv.slice(2))
         describe: 'Nunjucks options file',
     });
 
+function FrontMatterExtension() {
+    this.tags = ['fm'];
+
+    this.parse = (parser, nodes, lexer) => {
+        var tok = parser.nextToken();
+        var args = parser.parseSignature(null, true);
+        parser.nextToken();
+        var body = parser.parseUntilBlocks('endfm');
+        parser.advanceAfterBlockEnd();
+        return new nodes.CallExtension(this, 'run', args, [body]);
+    };
+
+    this.run = (context, args, body) => {
+        let jsonContents = args();
+        if (jsonContents) {
+            try {
+                let fm = JSON.parse(jsonContents);
+                Object.assign(context.ctx, fm);
+            } catch (err) {
+                throw new Error(`Error parsing JSON front-matter in "fm" tag. ${err}`);
+            }
+        }
+        return null;
+    };
+}
+
 (async () => {
     const inputDir = resolve(process.cwd(), argv.path) || '';
     const outputDir = argv.out || '';
-
     const context = argv._[1] ? JSON.parse(await fs.readFile(argv._[1], 'utf8')) : {};
     // Expose environment variables to render context
     context.env = process.env;
 
     /** @type {nunjucks.ConfigureOptions} */
-    const nunjucksOptions = argv.options
-        ? JSON.parse(await fs.readFile(argv.options, 'utf8'))
-        : { trimBlocks: true, lstripBlocks: true, noCache: true };
+    let nunjucksOptions = {
+        trimBlocks: true,
+        lstripBlocks: true,
+        noCache: true
+    };
 
+    if (argv.options) {
+        nunjucksOptions = JSON.parse(await fs.readFile(argv.options, 'utf8'));
+    }
     const nunjucksEnv = nunjucks.configure(inputDir, nunjucksOptions);
-
+    nunjucksEnv.addExtension('FrontMatterExtension', new FrontMatterExtension());
     const render = async (files) => {
         for (const file of files) {
-            // No performance benefits in async rendering
-            // https://mozilla.github.io/nunjucks/api.html#asynchronous-support
+            //render
             const res = nunjucksEnv.render(file, context);
             let outputFile = file.replace(/\.\w+$/, `.${argv.extension}`);
             if (outputDir) {

@@ -28,5 +28,13 @@ const cmd = `node main.js ${glob} ${context} -p ${src} -o ${dist}`;
     }
     filesCompiled = await fs.readdir(dist + '/third');
     deepStrictEqual(filesCompiled, ['third.html'], 'Templates not rendered correctly');
+    for (const file of filesCompiled) {
+        if (file.match(/.*\.html$/i)) {
+            const content = await fs.readFile(`${dist}/third/${file}`, 'utf8');
+            if (file === 'third.html') {
+                ok(content.includes('hello mars!'), 'Front-matter not parsed');
+            }
+        }
+    }
     // await fs.rm(dist, { recursive: true, force: true });
 })();

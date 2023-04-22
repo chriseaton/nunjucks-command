@@ -1,6 +1,19 @@
 # Nunjucks-Command
 
-A simple Nunjucks command-line wrapper and template watcher, to generate static HTML files.
+A simple Nunjucks command-line wrapper and template watcher, to generate static HTML files. Adds support for in-file
+JSON front-matter.
+
+For example the following would output a "hello mars!" message in the HTML:
+```html
+{% fm %}
+{
+    "message": "hello mars!"
+}
+{% endfm %}
+<html>
+    {{message}}
+</html>
+```
 
 Allows for newer versions of nunjucks async/await, and has a reduced dependency list from the forked original
 `nunjucks-cli`.
@@ -19,6 +32,12 @@ nunjucks <file|glob> [context] [options]
 ```
 
 _For convenience, `process.env` object is added to the context as `env`._
+
+### Front-Matter
+Include the supported front-matter start `{% fm %}`  and end `{% endfm %}` tags. Within these tags, add a valid JSON
+document. The values in this front-matter are assigned to the current context object for that rendered template only.
+
+This will override any preset or added context data for that template, from that render-point onward.
 
 #### Basic examples
 

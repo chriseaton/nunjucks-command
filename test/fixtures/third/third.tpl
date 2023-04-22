@@ -1,5 +1,10 @@
+{% fm %}
+{ 
+    "message": "hello mars!"
+}
+{% endfm %}
 {% extends "../_layout.tpl" %}
 {% block main %}
-  <h1>First Template</h1>
-  <p>{{ a }}</p>
+  <h1>Third Template</h1>
+  <p>{{ message }}</p>
 {% endblock %}
