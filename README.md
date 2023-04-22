@@ -86,9 +86,11 @@ Extension for rendered files. Defaults to `html`.
 Takes a json file as Nunjucks options. Defaults are :
 
 ```json
-trimBlocks: true,
-lstripBlocks: true,
-noCache: true
+{
+    "trimBlocks": true,
+    "lstripBlocks": true,
+    "noCache": true
+}
 ```
 
 See <https://mozilla.github.io/nunjucks/api.html#configure>
