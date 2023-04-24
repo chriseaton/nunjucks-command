@@ -11,7 +11,8 @@
 		"nunjucks": "./main.js"
 	},
 	"files": [
-		"main.js"
+		"main.js",
+		"include/*"
 	],
 	"keywords": [
 		"nunjucks",
