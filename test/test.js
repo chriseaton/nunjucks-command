@@ -8,7 +8,7 @@ const src = `test/fixtures`;
 const dist = `test/fixtures/dist`;
 const context = `test/fixtures/data.json`;
 const glob = `**/*.tpl`;
-const cmd = `node main.js ${glob} ${context} -p ${src} -o ${dist}`;
+const cmd = `node main.js ${glob} ${context} -s -p ${src} -o ${dist}`;
 
 (async () => {
     spawnSync(cmd, { shell: true, stdio: 'inherit' });
@@ -20,6 +20,7 @@ const cmd = `node main.js ${glob} ${context} -p ${src} -o ${dist}`;
             ok(content.startsWith('<!DOCTYPE html>'), 'Layout not extended');
             if (file === 'first.html') {
                 ok(content.includes('json,file'), 'Context not interpolated');
+                ok(content.includes('first-tpl'), 'Failed to include template slug.');
             }
             if (file === 'second.html') {
                 ok(content.includes('development'), 'Env variable not passed');

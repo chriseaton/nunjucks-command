@@ -8,6 +8,7 @@ import { Glob, glob } from 'glob';
 import yargs from 'yargs';
 import path from 'path';
 import fs from 'fs/promises';
+import StringUtility from './include/string-utility.js';
 
 const { argv } = yargs(process.argv.slice(2))
     .usage('Usage: nunjucks <file|glob> [context] [options]')
@@ -19,6 +20,11 @@ const { argv } = yargs(process.argv.slice(2))
     .alias('help', 'h')
     .locale('en')
     .version(false)
+    .option('slug', {
+        alias: 's',
+        requiresArg: false,
+        describe: 'Attach a "template.slug" property in data for each rendered file that represents the relative file path. This, for example, can be accessed in a nunjucks template: {{ template.slug }}',
+    })
     .option('path', {
         alias: 'p',
         string: true,
@@ -101,6 +107,9 @@ function FrontMatterExtension() {
     const render = async (files) => {
         for (const file of files) {
             //render
+            if (argv.slug) {
+                context.template = Object.assign(context.template || {}, {slug: StringUtility.slugify(file) });
+            }
             const res = nunjucksEnv.render(file, context);
             let outputFile = file.replace(/\.\w+$/, `.${argv.extension}`);
             if (outputDir) {

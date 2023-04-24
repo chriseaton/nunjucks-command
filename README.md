@@ -1,9 +1,12 @@
 # Nunjucks-Command
 
-A simple Nunjucks command-line (CLI) tool to compile and watch templates into static HTML files. Adds support for 
-in-file JSON front-matter via a custom nunjucks extension.
+A simple Nunjucks command-line (CLI) tool to compile and watch templates into static HTML files. 
 
-Not locked to any version of nunjucks, uses async/await, and has a small dependency list.
+In addition to rendering files with an input JSON blob, there is built-in support for a couple useful features:
+
+- Support for front-matter in your nunjucks templates.
+- Auto-generated template file slugs can be auto-injected into template data during render.
+- This package is not locked to any version of nunjucks, uses async/await, and has a minimal dependency list.
 
 ## Installation
 
@@ -66,6 +69,13 @@ See <https://mozilla.github.io/nunjucks/api.html#configure>
 `-o <directory>`
 
 Output directory.
+
+### `--slug`
+
+`-s`
+
+Attach a "template.slug" property in data for each rendered file that represents the relative file path. 
+This, for example, can be accessed in a nunjucks template: `{{ template.slug }}`
 
 ### `--watch`
 
