@@ -20,7 +20,7 @@ const cmd = `node main.js ${glob} ${context} -s -p ${src} -o ${dist}`;
             ok(content.startsWith('<!DOCTYPE html>'), 'Layout not extended');
             if (file === 'first.html') {
                 ok(content.includes('json,file'), 'Context not interpolated');
-                ok(content.includes('first-tpl'), 'Failed to include template slug.');
+                ok(content.includes('class="first"'), 'Failed to include template slug.');
             }
             if (file === 'second.html') {
                 ok(content.includes('development'), 'Env variable not passed');

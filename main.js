@@ -108,7 +108,7 @@ function FrontMatterExtension() {
         for (const file of files) {
             //render
             if (argv.slug) {
-                context.template = Object.assign(context.template || {}, {slug: StringUtility.slugify(file) });
+                context.template = Object.assign(context.template || {}, {slug: StringUtility.slugify(file.substring(0, file.length - path.extname(file).length)) });
             }
             const res = nunjucksEnv.render(file, context);
             let outputFile = file.replace(/\.\w+$/, `.${argv.extension}`);
