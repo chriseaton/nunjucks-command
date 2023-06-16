@@ -23,7 +23,7 @@ const { argv } = yargs(process.argv.slice(2))
     .option('slug', {
         alias: 's',
         requiresArg: false,
-        describe: 'Attach a "template.slug" property in data for each rendered file that represents the relative file path. This, for example, can be accessed in a nunjucks template: {{ template.slug }}',
+        describe: 'Attach a "template.slug" property that represents the templates relative file path into that template\'s data. For example, this can be accessed in the template: {{ template.slug }}',
     })
     .option('path', {
         alias: 'p',
@@ -71,12 +71,23 @@ function FrontMatterExtension() {
         return new nodes.CallExtension(this, 'run', args, [body]);
     };
 
+    this.merge = (target, source) => {
+        for (let key in source) {
+            if (source[key] instanceof Object && target[key] instanceof Object) {
+                target[key] = this.merge(target[key], source[key]);
+            } else {
+                target[key] = source[key];
+            }
+        }
+        return target;
+    }
+
     this.run = (context, args, body) => {
         let jsonContents = args();
         if (jsonContents) {
             try {
                 let fm = JSON.parse(jsonContents);
-                Object.assign(context.ctx, fm);
+                this.merge(context.ctx, fm);
             } catch (err) {
                 throw new Error(`Error parsing JSON front-matter in "fm" tag. ${err}`);
             }
@@ -108,7 +119,7 @@ function FrontMatterExtension() {
         for (const file of files) {
             //render
             if (argv.slug) {
-                context.template = Object.assign(context.template || {}, {slug: StringUtility.slugify(file.substring(0, file.length - path.extname(file).length)) });
+                context.template = Object.assign(context.template || {}, { slug: StringUtility.slugify(file.substring(0, file.length - path.extname(file).length)) });
             }
             const res = nunjucksEnv.render(file, context);
             let outputFile = file.replace(/\.\w+$/, `.${argv.extension}`);
