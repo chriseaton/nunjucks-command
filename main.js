@@ -117,11 +117,13 @@ function FrontMatterExtension() {
     nunjucksEnv.addExtension('FrontMatterExtension', new FrontMatterExtension());
     const render = async (files) => {
         for (const file of files) {
+            let contextClone = Object.assign({}, context);
+            contextClone.template =  Object.assign({}, context.template);
             //render
             if (argv.slug) {
-                context.template = Object.assign(context.template || {}, { slug: StringUtility.slugify(file.substring(0, file.length - path.extname(file).length)) });
+                contextClone.template = Object.assign(contextClone.template, { slug: StringUtility.slugify(file.substring(0, file.length - path.extname(file).length)) });
             }
-            const res = nunjucksEnv.render(file, context);
+            const res = nunjucksEnv.render(file, contextClone);
             let outputFile = file.replace(/\.\w+$/, `.${argv.extension}`);
             if (outputDir) {
                 try {
