@@ -62,8 +62,10 @@ const { argv } = yargs(process.argv.slice(2))
 function merge(target, source) {
     for (let key in source) {
         if (source[key] instanceof Object && target[key] instanceof Object) {
-            target[key] = this.merge(target[key], source[key]);
-        } else {
+            target[key] = merge(target[key], source[key]);
+        } else if (!Array.isArray(source[key]) && source[key] instanceof Object && !(target[key] instanceof Object)) {
+            target[key] = merge({}, source[key]);
+        }else {
             target[key] = source[key];
         }
     }
@@ -82,12 +84,14 @@ function FrontMatterExtension() {
         return new nodes.CallExtension(this, 'run', args, [body]);
     };
 
+    this.merge = merge;
+
     this.run = (context, args, body) => {
         let jsonContents = args();
         if (jsonContents) {
             try {
                 let fm = JSON.parse(jsonContents);
-                merge(context.ctx, fm);
+                this.merge(context.ctx, fm);
             } catch (err) {
                 throw new Error(`Error parsing JSON front-matter in "fm" tag. ${err}`);
             }
@@ -120,7 +124,7 @@ function FrontMatterExtension() {
             let contextClone = merge({}, context);
             //render
             if (argv.slug) {
-                contextClone.template = Object.assign(contextClone.template, { slug: StringUtility.slugify(file.substring(0, file.length - path.extname(file).length)) });
+                contextClone.template = Object.assign(contextClone.template || {}, { slug: StringUtility.slugify(file.substring(0, file.length - path.extname(file).length)) });
             }
             const res = nunjucksEnv.render(file, contextClone);
             let outputFile = file.replace(/\.\w+$/, `.${argv.extension}`);
